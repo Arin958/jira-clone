@@ -48,7 +48,7 @@ const Board = () => {
   }
 
   const getTasksByColumn = (columnId) => {
-    return boardTasks.filter(task => task.status === columnId);
+    return boardTasks.filter(task => task?.status === columnId);
   };
 
   const handleAddTask = (columnId) => {
@@ -65,6 +65,7 @@ const Board = () => {
       comments: [],
       attachments: []
     };
+    console.log(newTask);
     dispatch(addTask({ boardId, task: newTask }));
     setIsTaskModalOpen(false);
     setSelectedColumn(null);
@@ -84,12 +85,15 @@ const Board = () => {
 
   const handleMoveTask = (taskId, newStatus) => {
     const task = boardTasks.find(t => t.id === taskId);
+  
     if (task && task.status !== newStatus) {
       dispatch(updateTask({
         boardId,
         taskId,
         updates: { status: newStatus }
       }));
+
+      console.log(`Moved task ${taskId} from ${task.status} to ${newStatus}`);
     }
   };
 
@@ -111,6 +115,7 @@ const Board = () => {
   const handleDrop = (e, columnId) => {
     e.preventDefault();
     const taskId = e.dataTransfer.getData('taskId');
+    console.log(`Dropping task ${taskId} into column ${columnId}`);
     handleMoveTask(taskId, columnId);
   };
 
@@ -163,7 +168,7 @@ const Board = () => {
         </div>
       </div>
 
-      {/* Kanban Columns */}
+     
       <div className="flex-1 overflow-x-auto px-6 pb-6">
         <div className="flex space-x-6 min-w-max">
           {columns.map((column) => {
@@ -175,7 +180,7 @@ const Board = () => {
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, column.id)}
               >
-                {/* Column Header */}
+              
                 <div className="bg-gray-100 rounded-t-lg p-3 flex justify-between items-center">
                   <div className="flex items-center space-x-2">
                     <span className="text-lg">{column.icon}</span>
@@ -192,7 +197,6 @@ const Board = () => {
                   </button>
                 </div>
 
-                {/* Column Tasks */}
                 <div className="bg-gray-50 rounded-b-lg p-3 min-h-[500px]">
                   {columnTasks.length === 0 ? (
                     <div className="text-center py-8">

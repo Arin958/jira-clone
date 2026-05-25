@@ -16,7 +16,7 @@ const CreateTaskModal = ({ isOpen, onClose, onCreate }) => {
         priority,
         dueDate: dueDate || null
       });
-      // Reset form
+
       setTitle('');
       setDescription('');
       setPriority('medium');

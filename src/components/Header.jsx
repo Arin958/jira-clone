@@ -1,6 +1,6 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { Bars3Icon } from '@heroicons/react/24/outline';
-import UserMenu from './UserMenu';
+import UserMenu from './auth/UserMenu';
 
 const Navbar = ({ sidebarOpen, setSidebarOpen }) => {
   const { user } = useAuth0();

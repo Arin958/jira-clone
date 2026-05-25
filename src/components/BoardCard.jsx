@@ -19,16 +19,16 @@ const BoardCard = ({ board, onClick }) => {
       onClick={onClick}
       className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer overflow-hidden"
     >
-      <div className={`h-32 bg-gradient-to-r ${getColorClass(board.color)} flex items-center justify-center`}>
+      <div className={`h-32 bg-linear-to-r ${getColorClass(board?.color)} flex items-center justify-center`}>
         <FolderIcon className="h-12 w-12 text-white opacity-75" />
       </div>
       <div className="p-4">
-        <h3 className="text-lg font-semibold text-gray-900 mb-1">{board.name}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-1">{board?.name}</h3>
         {board.description && (
           <p className="text-gray-600 text-sm mb-3 line-clamp-2">{board.description}</p>
         )}
         <div className="flex justify-between items-center text-sm text-gray-500">
-          <span>Created {new Date(board.createdAt).toLocaleDateString()}</span>
+          <span>Created {new Date(board?.createdAt).toLocaleDateString()}</span>
           <span className="flex items-center">
             <span className="mr-1">📋</span> {board.taskCount || 0} tasks
           </span>

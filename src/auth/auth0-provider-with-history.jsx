@@ -1,8 +1,7 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { Auth0Provider } from "@auth0/auth0-react";
 
 const Auth0ProviderWithHistory = ({ children }) => {
-
   const domain = import.meta.env.VITE_AUTH0_DOMAIN;
   const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
 
@@ -19,9 +18,13 @@ const Auth0ProviderWithHistory = ({ children }) => {
       domain={domain}
       clientId={clientId}
       authorizationParams={{
-        redirect_uri: window.location.origin
+        redirect_uri: window.location.origin,
+        scope: "openid profile email offline_access",
       }}
       onRedirectCallback={onRedirectCallback}
+      useRefreshTokens={true}
+      cacheLocation="localstorage"
+      sessionCheckExpiryDays={7}
     >
       {children}
     </Auth0Provider>
