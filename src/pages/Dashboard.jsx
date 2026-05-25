@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { addBoard, setCurrentBoard } from '../store/slices/boardsSlice';
+import { addBoard, setCurrentBoard } from '../store/slices/boardSlice';
 import { useNavigate } from 'react-router-dom';
 import CreateBoardModal from '../components/CreateBoardModal';
 import BoardCard from '../components/BoardCard';
