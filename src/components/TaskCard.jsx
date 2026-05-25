@@ -17,7 +17,7 @@ const TaskCard = ({ task, onTaskClick, onDeleteTask, onDragStart }) => {
 
   return (
     <div
-      draggable
+      draggable={true}
       onDragStart={(e) => onDragStart(e, task.id)}
       onClick={() => onTaskClick(task)}
       className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 cursor-pointer hover:shadow-md transition-shadow"

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+// Board.jsx - Fixed version
+import { useState, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { deleteBoard } from '../store/slices/boardSlice';
@@ -10,7 +11,7 @@ import {
   ArrowLeftIcon,
   EllipsisHorizontalIcon 
 } from '@heroicons/react/24/outline';
-import { deleteTask, addTask, updateTask, } from '../store/slices/taskSlice';
+import { deleteTask, addTask, updateTask } from '../store/slices/taskSlice';
 
 const Board = () => {
   const { boardId } = useParams();
@@ -19,6 +20,8 @@ const Board = () => {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [selectedColumn, setSelectedColumn] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [draggedTaskId, setDraggedTaskId] = useState(null);
+
 
   const { boards } = useSelector((state) => state.boards);
   const { tasks } = useSelector((state) => state.tasks);
@@ -26,26 +29,12 @@ const Board = () => {
   const currentBoard = boards.find(board => board.id === boardId);
   const boardTasks = tasks[boardId] || [];
 
- 
   const columns = [
     { id: 'todo', title: 'To Do', color: 'bg-gray-500', icon: '📝' },
     { id: 'in-progress', title: 'In Progress', color: 'bg-yellow-500', icon: '⚙️' },
     { id: 'done', title: 'Done', color: 'bg-green-500', icon: '✅' }
   ];
 
-  if (!currentBoard) {
-    return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Board not found</h2>
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="text-blue-600 hover:text-blue-700"
-        >
-          Go back to Dashboard
-        </button>
-      </div>
-    );
-  }
 
   const getTasksByColumn = (columnId) => {
     return boardTasks.filter(task => task?.status === columnId);
@@ -65,14 +54,12 @@ const Board = () => {
       comments: [],
       attachments: []
     };
-    console.log(newTask);
     dispatch(addTask({ boardId, task: newTask }));
     setIsTaskModalOpen(false);
     setSelectedColumn(null);
   };
 
   const handleTaskClick = (task) => {
-    // We'll implement task details modal later
     console.log('Task clicked:', task);
   };
 
@@ -83,19 +70,18 @@ const Board = () => {
     }
   };
 
-  const handleMoveTask = (taskId, newStatus) => {
+  const handleMoveTask = useCallback((taskId, newStatus) => {
     const task = boardTasks.find(t => t.id === taskId);
-  
+    
     if (task && task.status !== newStatus) {
       dispatch(updateTask({
         boardId,
         taskId,
         updates: { status: newStatus }
       }));
-
       console.log(`Moved task ${taskId} from ${task.status} to ${newStatus}`);
     }
-  };
+  }, [boardTasks, boardId, dispatch]);
 
   const handleDeleteTask = (taskId) => {
     if (window.confirm('Are you sure you want to delete this task?')) {
@@ -103,21 +89,63 @@ const Board = () => {
     }
   };
 
-  // Drag and drop handlers
-  const handleDragStart = (e, taskId) => {
-    e.dataTransfer.setData('taskId', taskId);
-  };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
+  const handleDragStart = useCallback((e, taskId) => {
 
-  const handleDrop = (e, columnId) => {
+    e.dataTransfer.setData('text/plain', taskId);
+    e.dataTransfer.effectAllowed = 'move';
+    
+    setDraggedTaskId(taskId);
+    
+    // Add drag image (optional)
+    if (e.target instanceof HTMLElement) {
+      e.dataTransfer.setDragImage(e.target, 20, 20);
+    }
+    
+    console.log('Drag started for task:', taskId);
+  }, []);
+
+  const handleDragOver = useCallback((e) => {
     e.preventDefault();
-    const taskId = e.dataTransfer.getData('taskId');
-    console.log(`Dropping task ${taskId} into column ${columnId}`);
-    handleMoveTask(taskId, columnId);
-  };
+    e.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  const handleDrop = useCallback((e, columnId) => {
+    e.preventDefault();
+    
+    let taskId = e.dataTransfer.getData('text/plain');
+    if (!taskId && draggedTaskId) {
+      taskId = draggedTaskId;
+    }
+    
+    if (taskId) {
+      console.log(`Dropping task ${taskId} into column ${columnId}`);
+      handleMoveTask(taskId, columnId);
+    } else {
+      console.warn('No taskId found during drop');
+    }
+    
+    setDraggedTaskId(null);
+  }, [handleMoveTask, draggedTaskId]);
+
+  const handleDragEnd = useCallback(() => {
+    setDraggedTaskId(null);
+    console.log('Drag ended');
+  }, []);
+
+  if (!currentBoard) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Board not found</h2>
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="text-blue-600 hover:text-blue-700"
+        >
+          Go back to Dashboard
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex flex-col">
@@ -168,7 +196,7 @@ const Board = () => {
         </div>
       </div>
 
-     
+      {/* Board Columns */}
       <div className="flex-1 overflow-x-auto px-6 pb-6">
         <div className="flex space-x-6 min-w-max">
           {columns.map((column) => {
@@ -180,7 +208,7 @@ const Board = () => {
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, column.id)}
               >
-              
+                {/* Column Header */}
                 <div className="bg-gray-100 rounded-t-lg p-3 flex justify-between items-center">
                   <div className="flex items-center space-x-2">
                     <span className="text-lg">{column.icon}</span>
@@ -197,6 +225,7 @@ const Board = () => {
                   </button>
                 </div>
 
+                {/* Column Content */}
                 <div className="bg-gray-50 rounded-b-lg p-3 min-h-[500px]">
                   {columnTasks.length === 0 ? (
                     <div className="text-center py-8">
@@ -211,13 +240,19 @@ const Board = () => {
                   ) : (
                     <div className="space-y-3">
                       {columnTasks.map((task) => (
-                        <TaskCard
+                        <div
                           key={task.id}
-                          task={task}
-                          onTaskClick={handleTaskClick}
-                          onDeleteTask={handleDeleteTask}
-                          onDragStart={handleDragStart}
-                        />
+                          draggable={true}
+                          onDragStart={(e) => handleDragStart(e, task.id)}
+                          onDragEnd={handleDragEnd}
+                        >
+                          <TaskCard
+                            task={task}
+                            onTaskClick={handleTaskClick}
+                            onDeleteTask={handleDeleteTask}
+                            onDragStart={handleDragStart}
+                          />
+                        </div>
                       ))}
                     </div>
                   )}
