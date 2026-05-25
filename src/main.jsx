@@ -4,12 +4,19 @@ import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import Auth0ProviderWithHistory from "./auth/auth0-provider-with-history.jsx";
+import { Provider } from "react-redux";
+import { persistor, store } from "./store/store.js";
+import { PersistGate } from "redux-persist/integration/react";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <Auth0ProviderWithHistory>
-        <App />
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <App />
+          </PersistGate>
+        </Provider>
       </Auth0ProviderWithHistory>
     </BrowserRouter>
   </StrictMode>,
