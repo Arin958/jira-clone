@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Sidebar from '../components/Sidebar';
-import Navbar from '../components/Navbar';
+import Navbar from '../components/auth/Navbar';
 
 const MainLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
