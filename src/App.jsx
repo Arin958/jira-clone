@@ -4,7 +4,9 @@ import MainLayout from "./layout/MainLayout";
 import Dashboard from "./pages/Dashboard";
 import Board from "./pages/Board";
 import LoadingSpinner from "./components/LoadingSpinner";
-import NavBar from "./components/auth/Navbar";
+import LoginPage from "./components/auth/LoginPage";
+
+
 
 function App() {
   const { isLoading, isAuthenticated } = useAuth0();
@@ -50,7 +52,7 @@ function App() {
           )
         }
       />
-      <Route path="/login" element={<NavBar />} />
+      <Route path="/login" element={<LoginPage />} />
     </Routes>
   );
 }
