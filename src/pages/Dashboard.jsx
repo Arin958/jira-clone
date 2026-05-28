@@ -1,23 +1,28 @@
-import { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { addBoard, setCurrentBoard } from '../store/slices/boardSlice';
-import { useNavigate } from 'react-router-dom';
-import CreateBoardModal from '../components/CreateBoardModal';
-import BoardCard from '../components/BoardCard';
-import { PlusIcon, Square2StackIcon } from '@heroicons/react/24/outline';
+import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { addBoard, setCurrentBoard } from "../store/slices/boardSlice";
+import { useNavigate } from "react-router-dom";
+import CreateBoardModal from "../components/CreateBoardModal";
+import BoardCard from "../components/BoardCard";
+import { PlusIcon, Square2StackIcon } from "@heroicons/react/24/outline";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { boards } = useSelector((state) => state.boards);
+  const { tasks } = useSelector((state) => state.tasks);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const getTaskCount = (boardId) => {
+    return tasks[boardId]?.length || 0;
+  };
 
   const handleCreateBoard = (boardData) => {
     const newBoard = {
       id: Date.now().toString(),
       ...boardData,
       createdAt: new Date().toISOString(),
-      taskCount: 0
+      taskCount: 0,
     };
     dispatch(addBoard(newBoard));
     setIsModalOpen(false);
@@ -47,8 +52,12 @@ const Dashboard = () => {
       {boards.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg border-2 border-dashed border-gray-300">
           <Square2StackIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No boards yet</h3>
-          <p className="text-gray-600 mb-4">Create your first board to get started</p>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            No boards yet
+          </h3>
+          <p className="text-gray-600 mb-4">
+            Create your first board to get started
+          </p>
           <button
             onClick={() => setIsModalOpen(true)}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
@@ -59,10 +68,11 @@ const Dashboard = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {boards.map((board) => (
-            <BoardCard 
-              key={board.id} 
-              board={board} 
+            <BoardCard
+              key={board.id}
+              board={board}
               onClick={() => handleBoardClick(board)}
+              taskCount={getTaskCount(board.id)}
             />
           ))}
         </div>

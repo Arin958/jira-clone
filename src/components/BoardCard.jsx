@@ -1,7 +1,8 @@
 
 import { FolderIcon } from '@heroicons/react/24/outline';
 
-const BoardCard = ({ board, onClick }) => {
+const BoardCard = ({ board, onClick, taskCount }) => {
+  console.log('board', board);
   const getColorClass = (color) => {
     const colorMap = {
       'bg-blue-500': 'from-blue-500 to-blue-600',
@@ -30,7 +31,7 @@ const BoardCard = ({ board, onClick }) => {
         <div className="flex justify-between items-center text-sm text-gray-500">
           <span>Created {new Date(board?.createdAt).toLocaleDateString()}</span>
           <span className="flex items-center">
-            <span className="mr-1">📋</span> {board.taskCount || 0} tasks
+            <span className="mr-1">📋</span> {taskCount || 0} tasks
           </span>
         </div>
       </div>

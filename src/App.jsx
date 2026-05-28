@@ -1,18 +1,18 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useAuth0 } from "@auth0/auth0-react";
+
+
 import MainLayout from "./layout/MainLayout";
 import Dashboard from "./pages/Dashboard";
 import Board from "./pages/Board";
 import LoadingSpinner from "./components/LoadingSpinner";
 import LoginPage from "./components/auth/LoginPage";
-
-
+import RegisterPage from "./components/auth/Register";
+import useCustomAuth from "./hooks/useCustomAuth";
 
 function App() {
-  const { isLoading, isAuthenticated } = useAuth0();
-  console.log(isAuthenticated);
+  const { isAuthenticated, loading } = useCustomAuth();
 
-  if (isLoading) {
+  if (loading) {
     return <LoadingSpinner />;
   }
 
@@ -53,6 +53,7 @@ function App() {
         }
       />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
     </Routes>
   );
 }

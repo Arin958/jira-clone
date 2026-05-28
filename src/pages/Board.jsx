@@ -25,6 +25,8 @@ const Board = () => {
 
   const { boards } = useSelector((state) => state.boards);
   const { tasks } = useSelector((state) => state.tasks);
+
+  console.log('Tasks:', tasks);
   
   const currentBoard = boards.find(board => board.id === boardId);
   const boardTasks = tasks[boardId] || [];

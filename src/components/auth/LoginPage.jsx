@@ -1,27 +1,95 @@
 import { useState } from "react";
 
 import LoginForm from "../LoginForm";
+import { useNavigate } from "react-router-dom";
+import useCustomAuth from "../../hooks/useCustomAuth";
 
 const LoginPage = () => {
+   const navigate = useNavigate();
+  const { 
+    loginWithCustomForm, 
+    loginWithRedirect, 
+    loading, 
+    isAuthenticated 
+  } = useCustomAuth();
+  
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email: '',
+    password: ''
   });
   const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [serverError, setServerError] = useState('');
 
+  // Redirect if already authenticated
+  if (isAuthenticated) {
+    navigate('/dashboard');
+    return null;
+  }
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    }
+    return newErrors;
+  };
+
+  // Handle custom login with email/password
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const newErrors = validateForm();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
 
-    setIsLoading(true);
+    setServerError('');
     setErrors({});
+
+    const result = await loginWithCustomForm(formData.email, formData.password);
+    
+    if (result.success) {
+      console.log('Custom login successful!');
+      navigate('/dashboard');
+    } else {
+      setServerError(result.error);
+    }
+  };
+
+  // Handle Auth0 Google login
+  const handleGoogleLogin = () => {
+    console.log('Redirecting to Auth0 Google login...');
+    loginWithRedirect();
+  };
+
+  // Handle Auth0 with specific provider
+  const handleAuth0Login = (provider) => {
+    console.log(`Redirecting to Auth0 ${provider} login...`);
+    loginWithRedirect({
+      authorizationParams: {
+        connection: provider // 'google-oauth2', 'github', 'facebook', etc.
+      }
+    });
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
   };
-
   return (
     <div className="min-h-screen flex">
       {/* Left side */}
@@ -43,7 +111,17 @@ const LoginPage = () => {
       {/* Righ Side */}
 
       <div className="flex flex-col items-center justify-center bg-linear-to-br from-amber-50 to-amber-100 md:w-1/2 w-full px-6 py-12">
-       <LoginForm handleSubmit={handleSubmit} errors={errors} formData={formData} handleChange={handleChange} isLoading={isLoading}/>
+        <LoginForm
+          handleSubmit={handleSubmit}
+          errors={errors}
+          formData={formData}
+          handleChange={handleChange}
+          isLoading={loading}
+          serverError={serverError}
+          onGoogleLogin={handleGoogleLogin}
+          onAuth0Login={handleAuth0Login}
+
+        />
       </div>
     </div>
   );

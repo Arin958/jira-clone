@@ -20,6 +20,7 @@ const taskSlice = createSlice({
         state.tasks[boardId] = [];
       }
       state.tasks[boardId].push(task);
+      console.log('Task added:', task);
     },
     
     updateTask: (state, action) => {
