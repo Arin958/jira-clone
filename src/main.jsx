@@ -17,7 +17,7 @@ createRoot(document.getElementById("root")).render(
       <Auth0ProviderWithHistory>
           <Provider store={store}>
             <PersistGate loading={null} persistor={persistor}>
-              <AuthProvider>
+             
                 <App />
               </AuthProvider>
             </PersistGate>
