@@ -8,22 +8,20 @@ import Auth0ProviderWithHistory from "./auth/auth0-provider-with-history.jsx";
 import { Provider } from "react-redux";
 import { persistor, store } from "./store/store.js";
 import { PersistGate } from "redux-persist/integration/react";
-import { GoogleOAuthProvider } from "@react-oauth/google";
+
 import { AuthProvider } from "./contexts/AuthContext.jsx"; // Import AuthProvider
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <Auth0ProviderWithHistory>
-        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
           <Provider store={store}>
             <PersistGate loading={null} persistor={persistor}>
-              <AuthProvider> {/* Wrap App with AuthProvider */}
+              <AuthProvider>
                 <App />
               </AuthProvider>
             </PersistGate>
           </Provider>
-        </GoogleOAuthProvider>
       </Auth0ProviderWithHistory>
     </BrowserRouter>
   </StrictMode>,
